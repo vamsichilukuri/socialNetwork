@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="/public/css/main.min.css" />
+    <link rel="stylesheet" href="/public/css/style.css" />
+    <link rel="stylesheet" href="/public/css/color.css" />
+
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    />
+    <script src="/public/js/jquery-3.3.1.min.js"></script>
+    <script src="/public/js/script.js"></script>
+    <script src="/public/js/main.min.js"></script>
+    <script src="/public/js/socket.io.js"></script>
+
+    <style>
+      #post-img-preview,
+      #post-video-preview {
+        height: 300px;
+        width: 300px;
+        object-fit: cover;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="theme-layout">
+      <div class="topbar stick">
+        <div class="logo">
+          <a href="/">
+            <img src="/public/img/logo.png" alt="logo" />
+          </a>
+        </div>
+        <div class="top-area">
+          <ul class="main-menu" id="main-menu"></ul>
+
+          <ul class="setting-area"></ul>
+        </div>
+      </div>
+      <section>
+        <div class="feature-photo">
+          <figure>
+            <img
+              class="cover-photo"
+              id="cover-photo"
+              style="width: 100%; height: 700px; object-fit: cover;"
+            />
+          </figure>
+          <form class="edit-phto" id="form-cover-photo" onsubmit="return false">
+            <i class="fa fa-camera-retro"></i>
+            <label class="fileContainer">
+              Edit Cover Photo
+              <input
+                type="file"
+                accept="image/*"
+                name="coverPhoto"
+                onchange="uploadCoverPhoto();"
+                required
+              />
+            </label>
+          </form>
+          <div class="container-fluid">
+            <div class="row merged">
+              <div class="col-md-2">
+                <div class="user-avatar">
+                  <figure>
+                    <img
+                      class="profile-image"
+                      id="profile-image"
+                      style="width: 100%; height: 150px; object-fit: cover;"
+                    />
+                    <form
+                      class="edit-phto"
+                      id="form-upload-image"
+                      onsubmit="return false"
+                    >
+                      <i class="fa fa-camera-retro"></i>
+                      <label class="fileContainer">
+                        Edit Display Photo
+                        <input
+                          type="file"
+                          accept="image/*"
+                          name="profileImage"
+                          onchange="uploadImage();"
+                          required
+                        />
+                      </label>
+                    </form>
+                  </figure>
+                </div>
+              </div>
+              <div class="col-md-10">
+                <div class="timeline-info">
+                  <ul>
+                    <li class="admin-name">
+                      <h5
+                        class="user-name"
+                        style="padding-top: 20px; padding-bottom: 20px;"
+                      ></h5>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- details section -->
+
+      <section>
+        <div class="gap gray-bg">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="row" id="page-contents">
+                  <div class="col-md-3"></div>
+
+                  <div class="col-md-6">
+                    <div class="central-meta">
+                      <div class="editing-info">
+                        <h5 class="f-title">
+                          <i class="ti-info-alt"></i>
+                          Update Profile
+                        </h5>
+
+                        <form onsubmit="return doUpdateProfile(this);">
+                          <div class="form-group">
+                            <input
+                              type="text"
+                              class="name"
+                              name="name"
+                              required
+                            />
+                            <label class="control-label"> Full Name</label>
+                            <i class="mtrl-select"></i>
+                          </div>
+                          <br /><br />
+                          <!-- email -->
+                          <div class="form-group">
+                            <input class="email" />
+                            <label class="control-label"> Email</label>
+                            <i class="mtrl-select"></i>
+                          </div>
+                          <br /><br />
+                          <div class="form-group">
+                            <input
+                              type="text"
+                              class="dob"
+                              name="dob"
+                              placeholder="DD/MM/YY"
+                            />
+                            <label class="control-label"> Date of Birth</label>
+                            <i class="mtrl-select"></i>
+                          </div>
+                          <br /><br />
+                          <div class="form-group">
+                            <input type="text" class="city" name="city" />
+                            <label class="control-label">City</label>
+                            <i class="mtrl-select"></i>
+                          </div>
+                          <br /><br />
+
+                          <div class="form-group">
+                            <input type="text" class="country" name="country" />
+                            <label class="control-label">Country</label>
+                            <i class="mtrl-select"></i>
+                          </div>
+                          <br /><br />
+
+                          <div class="form-group">
+                            <textarea
+                              class="aboutMe"
+                              rows="4"
+                              name="aboutMe"
+                            ></textarea>
+                            <label class="control-label">About Me</label>
+                            <i class="mtrl-select"></i>
+                          </div>
+                          <br /><br />
+                          <button type="submit" class="mtr-btn" name="submit">
+                            <span>Save</span>
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- reply -->
+      <div
+        class="modal fade"
+        id="replyModel"
+        tabindex="-1"
+        role="dialog"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Reply</h5>
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form onsubmit="return doPostReply(this);">
+                <input type="hidden" name="postId" />
+                <input type="hidden" name="commentId" />
+                <textarea
+                  name="reply"
+                  placeholder="Post your reply.."
+                ></textarea>
+                <button type="submit">Post</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer>
+      <div class="container">
+        <div class="row">
+          your website &copy; <%= new Date().getFullYear() %>
+        </div>
+      </div>
+    </footer>
+    <!-- <script>
+      var mainURL = "http://localhost:3000";
+    </script> -->
+
+    <script>
+      var mainURL = "http://localhost:3000";
+      var months = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "April",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+      window.user = null;
+      var socketIO = io("http://localhost:3000");
+
+      function getUser() {
+        if (localStorage.getItem("accessToken")) {
+          var ajax = new XMLHttpRequest();
+          ajax.open("POST", "/getUser", true);
+
+          ajax.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+              var response = JSON.parse(this.responseText);
+              if (response.status == "success") {
+                window.user = response.data;
+
+                if (typeof isUpdateProfile !== "undefined" && isUpdateProfile) {
+                  showProfileData();
+                }
+                if (typeof isHomePage !== "undefined" && isHomePage) {
+                  showAndPost();
+                  showNewsfeed();
+                }
+              } else {
+                localStorage.removeItem("accessToken");
+              }
+              showMainMenu();
+            }
+          };
+          var formData = new FormData();
+          formData.append("accessToken", localStorage.getItem("accessToken"));
+          ajax.send(formData);
+        } else {
+          showMainMenu();
+        }
+      }
+
+      function showMainMenu() {
+        var html = "";
+        if (localStorage.getItem("accessToken")) {
+          html += "<li>";
+          html += '<a href="/">Home</a>';
+          html += "</li>";
+          html += "<li>";
+          html += '<a href="/groups">Groups</a>';
+          html += "</li>";
+          html += "<li>";
+          html += '<a href="/updateProfile">Profile</a>';
+          html += "</li>";
+          html += "<li>";
+          html += '<a href="/logout" onclick="return doLogout();">Logout</a>';
+          html += "</li>";
+        } else {
+          html += "<li>";
+          html += '<a href="/signup">Signup</a>';
+          html += "</li>";
+        }
+        document.querySelector("#main-menu").innerHTML = html;
+      }
+
+      function doLogout() {
+        localStorage.removeItem("accessToken");
+        return true;
+      }
+
+      window.onload = () => {
+        getUser();
+      };
+
+      window.onerror = (file, line, error) => {
+        alert(file + " " + line + " " + error);
+      };
+
+      var isUpdateProfile = true;
+
+      function showProfileData() {
+        document
+          .querySelector("#cover-photo")
+          .setAttribute("src", mainURL + "/" + window.user.coverPhoto);
+        document
+          .querySelector("#profile-image")
+          .setAttribute("src", mainURL + "/" + window.user.profileImage);
+        console.log(document.getElementById("profile-image"));
+        console.log(window.user.name);
+
+        document.querySelector(".user-name").innerHTML = window.user.name;
+        document.querySelector(".name").value = window.user.name;
+        document.querySelector(".email").value = window.user.email;
+        document.querySelector(".dob").value = window.user.dob;
+        document.querySelector(".city").value = window.user.city;
+        document.querySelector(".country").value = window.user.country;
+        document.querySelector(".aboutMe").value = window.user.aboutMe;
+      }
+      //cover photo
+      function uploadCoverPhoto(form) {
+        var form = document.getElementById("form-cover-photo");
+
+        var ajax = new XMLHttpRequest();
+        ajax.open("POST", "/uploadCoverPhoto", true);
+
+        ajax.onreadystatechange = () => {
+          if (this.readyState == 4 && this.status == 200) {
+            var response = JSON.parse(this.responseText);
+
+            document
+              .getElementById("cover-photo")
+              .setAttribute("src", response.data);
+          }
+        };
+        var formData = new FormData(form);
+        formData.append("accessToken", localStorage.getItem("accessToken"));
+        ajax.send(formData);
+
+        return false;
+      }
+
+      //profile image
+      function uploadImage(form) {
+        var form = document.getElementById("form-upload-image");
+
+        var ajax = new XMLHttpRequest();
+        ajax.open("POST", "/uploadProfileImage", true);
+
+        ajax.onreadystatechange = () => {
+          if (this.readyState == 4 && this.status == 200) {
+            var response = JSON.parse(this.responseText);
+
+            console.log(response.data);
+            document
+              .getElementById("profile-image")
+              .setAttribute("src", response.data);
+          }
+        };
+        var formData = new FormData(form);
+        formData.append("accessToken", localStorage.getItem("accessToken"));
+        ajax.send(formData);
+
+        return false;
+      }
+
+      //updating the user profile
+      function doUpdateProfile(form) {
+        form.submit.setAttribute("disabled", "disabled");
+        form.submit.innerHTML = "<span>Loading...</span>";
+
+        var ajax = new XMLHttpRequest();
+        ajax.open("POST", "/updateProfile", true);
+
+        ajax.onreadystatechange = function () {
+          if (this.readyState == 4 && this.status == 200) {
+            form.submit.removeAttribute("disabled");
+            form.submit.innerHTML = "<span>Save</span>";
+
+            var response = JSON.parse(this.responseText);
+            alert(response.message);
+          }
+        };
+
+        var formData = new FormData(form);
+        formData.append("accessToken", localStorage.getItem("accessToken"));
+        ajax.send(formData);
+
+        return false;
+      }
+      //likers
+
+      function createLikeSection(data) {
+        var isLiked = false;
+        for (var b = 0; b < data.likers.length; b++) {
+          var liker = data.likers.length[b];
+          if (liker._id == window.user._id) {
+            isLiked = true;
+            break;
+          }
+        }
+
+        var html = "";
+
+        html += '<div class="we-video-info">';
+        html += "<ul>";
+        html += "<li>";
+        var className = "";
+        if (isLiked) {
+          className = "like";
+        } else {
+          className = "none";
+        }
+        html +=
+          '<span class="' +
+          className +
+          '"onclick="toggleLikePost(this);" data-id="' +
+          data._id +
+          '">';
+        html += '<i class="ti-thumb-up"></i>';
+        html += "<ins>" + data.likers.length + "</ins>";
+        html += "</span>";
+
+        html += "</li>";
+
+        html += "<li>";
+        html += '<span class="comment" title="Comments">';
+        html += '<i class="fa fa-comments-o"></i>';
+        html += "<ins>" + data.comments.length + "</ins>";
+        html += "</span>";
+        html += "</li>";
+
+        html += "<li>";
+        html +=
+          '<span class="share" onclick="sharePost(this);" data-id="' +
+          data._id +
+          '">';
+        html += '<i class="ti-share"></i>';
+        html += "<ins>" + data.shares.length + "</ins>";
+        html += "</span>";
+        html += "</li>";
+        html += "</ul>";
+        html += "</div>";
+        return html;
+      }
+
+      //share post
+      function sharePost(self) {
+        if (confirm("Are you sure you want to share this post ?")) {
+          var _id = self.getAttribute("data-id");
+
+          var ajax = new XMLHttpRequest();
+          ajax.open("POST", "/sharePost", true);
+
+          ajax.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+              var response = JSON.parse(this.responseText);
+              alert(response);
+
+              if (response.status == "success") {
+                self.className = "like";
+
+                var shares = parseInt(self.querySelector("ins").innerHTML);
+                shares++;
+                self.querySelector("ins").innerHTML = shares;
+
+                showNewsfeed();
+              }
+            }
+          };
+
+          var formData = new FormData();
+          formData.append("accessToken", localStorage.getItem("accessToken"));
+          formData.append("_id", _id);
+          ajax.send(formData);
+        }
+      }
+
+      //comments section
+      function createCommentsSection(data) {
+        var html = "";
+
+        html += '<div class="coment-area">';
+        html +=
+          '<ul class="we-comet" style="max-height: 300px; overflow-y:scroll;">';
+        for (var b = 0; b < data.comments.length; b++) {
+          var comment = data.comments[b];
+
+          html += "<li>";
+          html += '<div class="comet-avatar">';
+          html +=
+            '<img src="' + mainURL + "/" + comment.user.profileImage + '">';
+          html += "</div>";
+
+          html += '<div class="we-comment">';
+          html += '<div class="coment-head">';
+          html += '<h5><a href="/">' + comment.user.name + "</a></h5>";
+          var createdAt = new Date(comment.createdAt);
+          var date = createdAt.getDate() + "";
+          date =
+            date.padStart(2, "0") +
+            " " +
+            months[createdAt.getMonth()] +
+            ", " +
+            createdAt.getFullYear();
+          html += "<span>" + date + "</span>";
+          html +=
+            '<a class="we-replay" href="javascript:void(0);" data-post-id="' +
+            data._id +
+            '"data-comment-id="' +
+            comment._id +
+            '"onclick="prepareToReplay(this);" title="Replay"><i class="fa fa-replay"></i><a/>';
+          html += "</div>";
+          html += "<p>" + comment.comment + "</p>";
+          html += "</div>";
+
+          html += "</li>";
+        }
+        html += "</ul>";
+
+        html += '<ul class="we-comet">';
+        html += '<li class="post-comment">';
+        html += '<div class="comet-avatar">';
+        html += '<img src="' + mainURL + "/" + window.user.profileImage + '">';
+        html += "</div>";
+        html += '<div class="post-comt-box">';
+        html += '<form method="post" onsubmit="return doPostComment(this);">';
+        html += '<input type="hidden" name="_id" value="' + data._id + '">';
+        html +=
+          '<textarea name="comment" placeholder="post your comment"></textarea>';
+        html += '<button type="submit">Post</button>';
+        html += "</form>";
+        html += "</div>";
+        html += "</li>";
+        html += "</ul>";
+        html += "</div>";
+
+        return html;
+      }
+      //script for doPost COMMENTS
+      function doPostComment(form) {
+        var ajax = new XMLHttpRequest();
+        ajax.open("POST", "/postComment", true);
+
+        ajax.onreadystatechange = function () {
+          if (this.readyState == 4 && this.status == 200) {
+            var response = JSON.parse(this.responseText);
+
+            alert(response.message);
+
+            if (response.status == "success") {
+              form.comment.value = "";
+            }
+          }
+        };
+        var formData = new FormData(form);
+        formData.append("accessToken", localStorage.getItem("accessToken"));
+        ajax.send(formData);
+
+        return false;
+      }
+
+      function showAndPost() {
+        if (localStorage.getItem("accessToken")) {
+          var html = `
+            <div class="central-meta">
+              <div class="new-postbox">
+                <figure>
+                  <img src="${mainURL}/${window.user.profileImage}">
+                </figure>
+
+                <div class="newpst-input">
+                   <form method="post" id="form-add-post" onsubmit="return doPost(this);">
+
+                    <input name="type" type="hidden" value="post">
+                    <textarea rows="2" name="caption" placeholder="write somthing"></textarea>
+                    <div class="attachments">
+                      <ul>
+                        <li>
+                          <img id="post-img-preview" style="display:none">
+                        </li>
+
+                        <li>
+                          <video id="post-video-preview" controls style="display:none"></video>
+                        </li>
+
+                        <li>
+                          <i class="fa fa-image"></i>
+                          <label class="fileContainer">
+                            <input type="file" name="image" accept="image/*" onchange="previewPostImage(this)">
+                          </label>
+                        </li>
+
+                        <li>
+                          <i class="fa fa-video-camera"></i>
+                          <label class="fileContainer">
+                            <input type="file" name="video" accept="video/*" onchange="previewPostVideo(this)">
+                          </label>
+                        </li>
+
+                        <li>
+                          <button type="submit">Post</button>;
+                        </li>
+
+                      </ul>
+                    </div>
+                  </form>
+                </div>
+              <div>
+            </div>`;
+          document.getElementById("add-post-box").innerHTML = html;
+        }
+      }
+
+      //select img
+      function previewPostImage(self) {
+        var file = self.files;
+        if (file.length > 0) {
+          var fileReader = new FileReader();
+
+          fileReader.onload = function (event) {
+            document.getElementById("post-img-preview").style.display = "";
+            document
+              .getElementById("post-img-preview")
+              .setAttribute("src", event.target.result);
+          };
+
+          fileReader.readAsDataURL(file[0]);
+        }
+        function previewPostVideo(self) {
+          var file = self.files;
+          if (file.length > 0) {
+            var fileReader = new FileReader();
+
+            fileReader.onload = function (event) {
+              document.getElementById("post-video-preview").style.display = "";
+              document
+                .getElementById("post-video-preview")
+                .setAttribute("src", event.target.result);
+            };
+            fileReader.readAsDataURL(file[0]);
+          }
+        }
+      }
+
+      //newsfeed
+      function showNewsfeed() {
+        var ajax = new XMLHttpRequest();
+        ajax.open("POST", "/getNewsfeed", true);
+
+        ajax.onreadystatechange = function () {
+          if (this.readyState == 4 && this.status == 200) {
+            var response = JSON.parse(this.responseText);
+            var html = "";
+            for (var v = response.data.length - 1; v >= 0; v--) {
+              var data = response.data[v];
+              html += '<div class="central-meta iteam">';
+              html += '<div class="user-post">';
+              html += '<div class="friend-info">';
+              html += "<figure>";
+              html +=
+                '<img src="' +
+                mainURL +
+                "/" +
+                data.user.profileImage +
+                '"style=width:45px;height:45px;object-fit:cover">';
+              html += "</figure>";
+
+              html += '<div class="friend-name">';
+              html += "<ins>";
+              html += '<a href="/user/"' + data.user._id + '">';
+              html += data.user.name;
+              html += "</a>";
+              html += "</ins>";
+
+              var createdAt = new Date(data.createdAt);
+              var date = createdAt.getDate() + "";
+              date =
+                date.padStart(2, "0") +
+                " " +
+                months[createdAt.getMonth()] +
+                ", " +
+                createdAt.getFullYear();
+              html += "<span>Published:" + date + "</span>";
+              html += "</div>";
+              html += '<div class="post-meta">';
+              html += "<p>";
+              html += data.caption;
+              html += "</p>";
+              html += "</div>";
+
+              if (data.image != "") {
+                html += '<img src="' + mainURL + "/" + data.image + '">';
+              }
+              if (data.video != "") {
+                html +=
+                  '<video style="height:350px;width:100%" controls src="' +
+                  mainURL +
+                  "/" +
+                  data.video +
+                  '"></video>';
+              }
+              html += createLikeSection(data);
+              html += "</div>";
+              html += "</div>";
+              html += createCommentsSection(data);
+              html += "</div>";
+              html += "</div>";
+            }
+            var divTag = document.createElement("div");
+            divTag.innerHTML = html;
+            document.getElementById("newsfeed").prepend(divTag);
+          }
+        };
+        var formData = new FormData();
+        formData.append("accessToken", localStorage.getItem("accessToken"));
+        ajax.send(formData);
+      }
+    </script>
+
+    <!-- req for profile image -->
+  </body>
+</html>

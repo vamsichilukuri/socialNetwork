@@ -1,0 +1,35 @@
+{
+  "name": "socialnetwork",
+  "version": "1.0.0",
+  "description": "social network backend code",
+    "engines": {
+    "node": "12.16.1"
+  },
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vamsichilukuri/socialNetwork.git"
+  },
+  "author": "vamsi chilukuri",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vamsichilukuri/socialNetwork/issues"
+  },
+  "homepage": "https://github.com/vamsichilukuri/socialNetwork#readme",
+  "dependencies": {
+    "bcrypt": "^4.0.1",
+    "bootstrap": "^4.5.0",
+    "ejs": "^3.1.3",
+    "express": "^4.17.1",
+    "express-formidable": "^1.2.0",
+    "fs": "0.0.1-security",
+    "http": "0.0.1-security",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.9.21",
+    "socket.io": "^2.3.0"
+  }
+}
