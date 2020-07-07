@@ -54,14 +54,15 @@ socketIO.on("connection", (socket) => {
 let port = process.eventNames.PORT || 3000;
 
 http.listen(port, () => {
-  console.log("Server Started");
+  // console.log("Server Started");
+  app.get("/", (req, res) => {
+    res.render("index");
+  });
 });
-// app.get("/", (req, res) => {
-//   res.end("Server connected to you");
-// });
+
 mongoClient.connect("mongodb://localhost:27017", (err, client) => {
   var database = client.db("social_network");
-  console.log("Database connected..");
+  // console.log("Database connected..");
 
   // SIGNUP Users GET and POST Req
 
