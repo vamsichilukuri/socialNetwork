@@ -2,7 +2,7 @@
   "name": "socialnetwork",
   "version": "1.0.0",
   "description": "social network backend code",
-    "engines": {
+  "engines": {
     "node": "12.16.1"
   },
   "main": "server.js",
@@ -29,7 +29,7 @@
     "fs": "0.0.1-security",
     "http": "0.0.1-security",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.9.21",
+    "mongodb": "^3.5.9",
     "socket.io": "^2.3.0"
   }
 }
