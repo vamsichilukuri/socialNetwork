@@ -60,9 +60,19 @@ http.listen(port, () => {
   });
 });
 
-mongoClient.connect("mongodb://localhost:27017", (err, client) => {
+const MongoClient = require("mongodb").MongoClient;
+const uri =
+  "mongodb+srv://social:social@socialnetwork.lrsx9.mongodb.net/<dbname>?retryWrites=true&w=majority";
+const client = new MongoClient(uri, { useNewUrlParser: true });
+client.connect((err) => {
   var database = client.db("social_network");
-  console.log("Database connected..");
+  // perform actions on the collection object
+  // client.close();
+  // });
+
+  // mongoClient.connect("mongodb://localhost:27017", (err, client) => {
+  //   var database = client.db("social_network");
+  //   console.log("Database connected..");
 
   // SIGNUP Users GET and POST Req
 
@@ -82,7 +92,6 @@ mongoClient.connect("mongodb://localhost:27017", (err, client) => {
         $or: [{ email: email }, { username: username }],
       },
       function (error, user) {
-        console.log(user);
         if (user == null) {
           database.collection("users").insertOne(
             {
