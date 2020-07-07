@@ -10,7 +10,7 @@ var mongoClient = mongodb.MongoClient;
 var ObjectId = mongodb.ObjectId;
 
 var http = require("http").createServer(app);
-var bcrypt = require("bcrypt");
+// var bcrypt = require("bcrypt");
 var fileSystem = require("fs");
 
 var jwt = require("jsonwebtoken");
@@ -46,8 +46,8 @@ var users = [];
 var mainURL = "http://localhost:3000";
 
 socketIO.on("connection", (socket) => {
-  console.log(socket.id);
-  console.log("User Connected", socket.id);
+  // console.log(socket.id);
+  // console.log("User Connected", socket.id);
   socketID = socket.id;
 });
 
@@ -62,7 +62,7 @@ http.listen(port, () => {
 
 mongoClient.connect("mongodb://localhost:27017", (err, client) => {
   var database = client.db("social_network");
-  // console.log("Database connected..");
+  console.log("Database connected..");
 
   // SIGNUP Users GET and POST Req
 
