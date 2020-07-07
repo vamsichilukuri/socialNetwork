@@ -51,7 +51,7 @@ socketIO.on("connection", (socket) => {
   socketID = socket.id;
 });
 
-let port = process.eventNames.PORT || 3000;
+let port = process.env.PORT || 3000;
 
 http.listen(port, () => {
   // console.log("Server Started");
