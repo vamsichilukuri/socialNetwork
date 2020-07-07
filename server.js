@@ -82,35 +82,34 @@ mongoClient.connect("mongodb://localhost:27017", (err, client) => {
         $or: [{ email: email }, { username: username }],
       },
       function (error, user) {
+        console.log(user);
         if (user == null) {
-          bcrypt.hash(password, 10, function (error, hash) {
-            database.collection("users").insertOne(
-              {
-                name: name,
-                username: username,
-                email: email,
-                password: hash,
-                gender: gender,
-                profileImage: "",
-                coverPhoto: "",
-                dob: "",
-                city: "",
-                country: "",
-                aboutMe: "",
-                friends: [],
-                pages: [],
-                notifications: [],
-                groups: [],
-                posts: [],
-              },
-              function (error, data) {
-                res.json({
-                  status: "success",
-                  message: "Signup successfully. you can login now",
-                });
-              }
-            );
-          });
+          database.collection("users").insertOne(
+            {
+              name: name,
+              username: username,
+              email: email,
+              password: password,
+              gender: gender,
+              profileImage: "",
+              coverPhoto: "",
+              dob: "",
+              city: "",
+              country: "",
+              aboutMe: "",
+              friends: [],
+              pages: [],
+              notifications: [],
+              groups: [],
+              posts: [],
+            },
+            function (error, data) {
+              res.json({
+                status: "success",
+                message: "Signup successfully. you can login now",
+              });
+            }
+          );
         } else {
           res.json({
             status: "error",
@@ -133,6 +132,7 @@ mongoClient.connect("mongodb://localhost:27017", (err, client) => {
     database.collection("users").findOne(
       {
         email: email,
+        password: password,
       },
       (error, user) => {
         if (user == null) {
@@ -140,35 +140,37 @@ mongoClient.connect("mongodb://localhost:27017", (err, client) => {
             status: "error",
             message: "Email does not exist",
           });
-        } else {
-          bcrypt.compare(password, user.password, (error, isVerify) => {
-            if (isVerify) {
-              var accessToken = jwt.sign({ email: email }, accessTokenSecret);
-              database.collection("users").findOneAndUpdate(
-                {
-                  email: email,
-                },
-                {
-                  $set: {
-                    accessToken: accessToken,
-                  },
-                },
-                (error, data) => {
-                  res.json({
-                    status: "success",
-                    message: "Login Successfully",
-                    accessToken: accessToken,
-                    profileImage: user.profileImage,
-                  });
-                }
-              );
-            } else {
+        }
+        if (user) {
+          var accessToken = jwt.sign(
+            { email: email, password: password },
+            accessTokenSecret
+          );
+          database.collection("users").findOneAndUpdate(
+            {
+              email: email,
+              password: password,
+            },
+            {
+              $set: {
+                accessToken: accessToken,
+              },
+            },
+            (error, data) => {
               res.json({
-                status: "error",
-                message: "Password is not correct",
+                status: "success",
+                message: "Login Successfully",
+                accessToken: accessToken,
+                profileImage: user.profileImage,
               });
             }
-          });
+          );
+          // } else {
+          //   res.json({
+          //     status: "error",
+          //     message: "Password is not correct",
+          //   });
+          // }
         }
       }
     );
