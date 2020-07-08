@@ -63,7 +63,9 @@ http.listen(port, () => {
 const MongoClient = require("mongodb").MongoClient;
 const uri =
   "mongodb+srv://social:social@socialnetwork.lrsx9.mongodb.net/<dbname>?retryWrites=true&w=majority";
-const client = new MongoClient(uri, { useNewUrlParser: true });
+const client = new MongoClient(process.env.MONGODB_URL || uri, {
+  useNewUrlParser: true,
+});
 client.connect((err) => {
   var database = client.db("social_network");
   // perform actions on the collection object
@@ -72,7 +74,7 @@ client.connect((err) => {
 
   // mongoClient.connect("mongodb://localhost:27017", (err, client) => {
   //   var database = client.db("social_network");
-  //   console.log("Database connected..");
+  console.log("Database connected..");
 
   // SIGNUP Users GET and POST Req
 
